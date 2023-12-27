@@ -1,4 +1,4 @@
-package db
+package repository
 
 import "gorm.io/gorm"
 
@@ -14,6 +14,8 @@ type Problem struct {
 	Enable int `gorm:"column:enable" json:"enable"`
 	// 支持的语言用,分割
 	Languages string `gorm:"column:languages" json:"languages"`
+	// 所属题单
+	Menus []*ProblemMenu `gorm:"many2many:problem_menu_association" json:"menus"`
 	// 所属标签
 	// Tags []*ProblemTag `gorm:"many2many:problem_tag_association" json:"tags"`
 }
