@@ -1,11 +1,11 @@
-package model
+package db
 
 import (
 	"gorm.io/gorm"
 	"time"
 )
 
-type User struct {
+type SysUser struct {
 	gorm.Model
 	Avatar       string `gorm:"column:avatar" json:"avatar"`
 	UserName     string `gorm:"column:user_name" json:"username"`
@@ -17,4 +17,10 @@ type User struct {
 	// 1表示男 2表示女
 	Gender   int       `gorm:"column:gender" json:"gender"`
 	BirthDay time.Time `gorm:"column:birth_day" json:"birthDay"`
+	// 所属角色
+	Roles []*SysRole `gorm:"many2many:user_role;" json:"roles"`
+}
+
+func (s *SysUser) TableName() string {
+	return "user"
 }
