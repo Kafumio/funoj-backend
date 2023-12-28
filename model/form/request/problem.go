@@ -1,10 +1,10 @@
 package request
 
-type Problem struct {
-	Number     string `json:"number"`
+type ProblemForList struct {
+	ID         uint   `json:"id"`
 	Name       string `json:"name"`
+	Number     string `json:"number"`
+	MenuID     *uint  `json:"menuID"`
 	Difficulty int    `json:"difficulty"`
-	// 0空值，1启用，-1停用
-	Enable int   `gorm:"column:enable" json:"enable"`
-	MenuID *uint `json:"menuID"`
+	Enable     int    `json:"enable"`
 }

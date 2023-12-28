@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"funoj-backend/model/dto"
 	"funoj-backend/model/form/request"
 	"funoj-backend/model/repository"
 	"gorm.io/gorm"
@@ -29,8 +28,8 @@ type ProblemDao interface {
 	SetProblemEnable(db *gorm.DB, id uint, enable int) error
 	// DeleteProblemByID 删除题目
 	DeleteProblemByID(db *gorm.DB, id uint) error
-	GetProblemList(db *gorm.DB, pageQuery *dto.PageQuery) ([]*repository.Problem, error)
-	GetProblemCount(db *gorm.DB, problem *request.Problem) (int64, error)
+	GetProblemList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.Problem, error)
+	GetProblemCount(db *gorm.DB, problem *request.ProblemForList) (int64, error)
 }
 
 type ProblemDaoImpl struct {
@@ -47,7 +46,8 @@ func (dao *ProblemDaoImpl) GetProblemByNumber(db *gorm.DB, problemNumber string)
 }
 
 func (dao *ProblemDaoImpl) GetProblemIDByNumber(db *gorm.DB, problemNumber string) (uint, error) {
-	problem, err := dao.GetProblemByNumber(db, problemNumber)
+	problem := &repository.Problem{}
+	err := db.Where("number = ?", problemNumber).Select("id").Find(problem).Error
 	return problem.ID, err
 }
 
@@ -58,14 +58,15 @@ func (dao *ProblemDaoImpl) GetProblemByID(db *gorm.DB, problemID uint) (*reposit
 }
 
 func (dao *ProblemDaoImpl) GetProblemNameByID(db *gorm.DB, problemID uint) (string, error) {
-	problem, err := dao.GetProblemByID(db, problemID)
+	problem := &repository.Problem{}
+	err := db.Where("id = ?", problemID).Select("name").Find(problem).Error
 	return problem.Name, err
 }
 
-func (dao *ProblemDaoImpl) GetProblemList(db *gorm.DB, pageQuery *dto.PageQuery) ([]*repository.Problem, error) {
-	var problem *request.Problem
+func (dao *ProblemDaoImpl) GetProblemList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.Problem, error) {
+	var problem *request.ProblemForList
 	if pageQuery.Query != nil {
-		problem = pageQuery.Query.(*request.Problem)
+		problem = pageQuery.Query.(*request.ProblemForList)
 	}
 	if problem != nil && problem.MenuID != nil {
 		db = db.Preload("Menus", func(db *gorm.DB) *gorm.DB {
@@ -95,7 +96,7 @@ func (dao *ProblemDaoImpl) GetProblemList(db *gorm.DB, pageQuery *dto.PageQuery)
 	return problems, err
 }
 
-func (dao *ProblemDaoImpl) GetProblemCount(db *gorm.DB, problem *request.Problem) (int64, error) {
+func (dao *ProblemDaoImpl) GetProblemCount(db *gorm.DB, problem *request.ProblemForList) (int64, error) {
 	var count int64
 	if problem != nil && problem.MenuID != nil {
 		db = db.Preload("Menus", func(db *gorm.DB) *gorm.DB {

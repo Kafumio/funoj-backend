@@ -1,4 +1,4 @@
-package dto
+package request
 
 type PageInfo struct {
 	Size  int64       `json:"size"`
