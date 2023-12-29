@@ -7,21 +7,21 @@ import (
 )
 
 type ProblemMenuDao interface {
-	// InsertProblemMenu 添加题库
+	// InsertProblemMenu 添加题单
 	InsertProblemMenu(db *gorm.DB, bank *repository.ProblemMenu) error
-	// GetProblemMenuByID 根据题库id获取题库
+	// GetProblemMenuByID 根据题单id获取题单
 	GetProblemMenuByID(db *gorm.DB, bankID uint) (*repository.ProblemMenu, error)
-	// UpdateProblemMenu 更新题库
+	// UpdateProblemMenu 更新题单
 	UpdateProblemMenu(db *gorm.DB, bank *repository.ProblemMenu) error
-	// DeleteProblemMenuByID 删除题库
+	// DeleteProblemMenuByID 删除题单
 	DeleteProblemMenuByID(db *gorm.DB, id uint) error
-	// GetProblemMenuCount 读取题库数量
+	// GetProblemMenuCount 读取题单数量
 	GetProblemMenuCount(db *gorm.DB, problemBank *request.ProblemMenuForList) (int64, error)
-	// GetProblemMenuList 获取题库列表
+	// GetProblemMenuList 获取题单列表
 	GetProblemMenuList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.ProblemMenu, error)
 	// GetAllProblemMenu 获取所有的题目数据
 	GetAllProblemMenu(db *gorm.DB) ([]*repository.ProblemMenu, error)
-	// GetSimpleProblemMenuList 获取题库列表，只包含id和名称
+	// GetSimpleProblemMenuList 获取题单列表，只包含id和名称
 	GetSimpleProblemMenuList(db *gorm.DB) ([]*repository.ProblemMenu, error)
 }
 
