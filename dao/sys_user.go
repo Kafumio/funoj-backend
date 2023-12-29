@@ -69,7 +69,7 @@ func (s *SysUserDaoImpl) GetUserByID(db *gorm.DB, userID uint) (*repository.SysU
 
 func (s *SysUserDaoImpl) GetUserNameByID(db *gorm.DB, userID uint) (string, error) {
 	user := &repository.SysUser{}
-	err := db.Where("id = ?", userID).Select("user_name").Find(user).Error
+	err := db.Where("id = ?", userID).Select("user_name").Find(&user).Error
 	return user.UserName, err
 }
 
