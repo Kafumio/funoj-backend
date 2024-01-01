@@ -36,6 +36,8 @@ type SysUserDao interface {
 	DeleteUserRoleByUserID(db *gorm.DB, userID uint) error
 	// GetRolesByUserID 通过用户id获取用户的角色身份
 	GetRolesByUserID(db *gorm.DB, userID uint) ([]*repository.SysRole, error)
+	// GetRoleIDsByUserID 通过用户id获取用户的角色组id
+	GetRoleIDsByUserID(db *gorm.DB, userID uint) ([]uint, error)
 	// InsertRolesToUser 归档用户到对应角色组
 	InsertRolesToUser(db *gorm.DB, userID uint, roleIDs []uint) error
 	// UpdateUserPassword 更新用户密码

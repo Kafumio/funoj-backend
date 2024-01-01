@@ -16,6 +16,22 @@ import (
 )
 
 type SysUserService interface {
+	// GetUserByID 根据用户id获取用户信息
+	GetUserByID(userID uint) (*repository.SysUser, *e.Error)
+	// InsertSysUser 添加用户
+	InsertSysUser(user *repository.SysUser) (uint, *e.Error)
+	// UpdateSysUser 更新用户，但是不更新密码
+	UpdateSysUser(user *repository.SysUser) *e.Error
+	// DeleteSysUser 删除用户
+	DeleteSysUser(userID uint) *e.Error
+	// GetSysUserList 获取用户列表
+	GetSysUserList(pageQuery *request.PageQuery) (*respnose.PageInfo, *e.Error)
+	// UpdateUserRoles 更新角色roleIDs
+	UpdateUserRoles(userID uint, roleIDs []uint) *e.Error
+	// GetRoleIDsByUserID 通过用户id获取所有角色id
+	GetRoleIDsByUserID(userID uint) ([]uint, *e.Error)
+	// GetAllSimpleRole 简单展示用户可归属的所有角色
+	GetAllSimpleRole() ([]*dto.SimpleRoleDto, *e.Error)
 }
 
 type SysUserServiceImpl struct {
@@ -129,4 +145,40 @@ func (s *SysUserServiceImpl) GetSysUserList(pageQuery *request.PageQuery) (*resp
 		return nil, e.ErrMysql
 	}
 	return pageInfo, nil
+}
+
+func (s *SysUserServiceImpl) UpdateUserRoles(userID uint, roleIDs []uint) *e.Error {
+	tx := db.Mysql.Begin()
+	err := s.sysUserDao.DeleteUserRoleByUserID(tx, userID)
+	if err != nil {
+		tx.Rollback()
+		return e.ErrMysql
+	}
+	err = s.sysUserDao.InsertRolesToUser(tx, userID, roleIDs)
+	if err != nil {
+		tx.Rollback()
+		return e.ErrMysql
+	}
+	tx.Commit()
+	return nil
+}
+
+func (s *SysUserServiceImpl) GetRoleIDsByUserID(userID uint) ([]uint, *e.Error) {
+	roleIDs, err := s.sysUserDao.GetRoleIDsByUserID(db.Mysql, userID)
+	if err != nil {
+		return nil, e.ErrMysql
+	}
+	return roleIDs, nil
+}
+
+func (s *SysUserServiceImpl) GetAllSimpleRole() ([]*dto.SimpleRoleDto, *e.Error) {
+	roles, err := s.sysRoleDao.GetAllSimpleRoleList(db.Mysql)
+	if err != nil {
+		return nil, e.ErrMysql
+	}
+	simpleRoles := make([]*dto.SimpleRoleDto, len(roles))
+	for i, role := range roles {
+		simpleRoles[i] = dto.NewSimpleRoleDto(role)
+	}
+	return simpleRoles, nil
 }
