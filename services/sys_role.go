@@ -16,14 +16,14 @@ import (
 type SysRoleService interface {
 	// GetRoleByID 根角色户id获取角色信息
 	GetRoleByID(roleID uint) (*repository.SysRole, *e.Error)
-	// InsertSysRole 添加角色
-	InsertSysRole(sysSysRole *repository.SysRole) (uint, *e.Error)
-	// UpdateSysRole 更新角色
-	UpdateSysRole(SysRole *repository.SysRole) *e.Error
-	// DeleteSysRole 删除角色
-	DeleteSysRole(id uint) *e.Error
-	// GetSysRoleList 获取角色列表
-	GetSysRoleList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error)
+	// InsertRole 添加角色
+	InsertRole(sysSysRole *repository.SysRole) (uint, *e.Error)
+	// UpdateRole 更新角色
+	UpdateRole(SysRole *repository.SysRole) *e.Error
+	// DeleteRole 删除角色
+	DeleteRole(id uint) *e.Error
+	// GetRoleList 获取角色列表
+	GetRoleList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error)
 	// UpdateRolePermissions 更新角色权限
 	UpdateRolePermissions(roleID uint, permissionIDs []uint) *e.Error
 	// GetPermissionIDsByRoleID 通过角色id获取该角色拥有的权限ID
@@ -54,7 +54,7 @@ func (s *SysRoleServiceImpl) GetRoleByID(roleID uint) (*repository.SysRole, *e.E
 	return role, nil
 }
 
-func (s *SysRoleServiceImpl) InsertSysRole(role *repository.SysRole) (uint, *e.Error) {
+func (s *SysRoleServiceImpl) InsertRole(role *repository.SysRole) (uint, *e.Error) {
 	err := s.sysRoleDao.InsertRole(db.Mysql, role)
 	if err != nil {
 		return 0, e.ErrMysql
@@ -62,7 +62,7 @@ func (s *SysRoleServiceImpl) InsertSysRole(role *repository.SysRole) (uint, *e.E
 	return role.ID, nil
 }
 
-func (r *SysRoleServiceImpl) UpdateSysRole(sysRole *repository.SysRole) *e.Error {
+func (r *SysRoleServiceImpl) UpdateRole(sysRole *repository.SysRole) *e.Error {
 	sysRole.UpdatedAt = time.Now()
 	err := r.sysRoleDao.UpdateRole(db.Mysql, sysRole)
 	if err != nil {
@@ -71,7 +71,7 @@ func (r *SysRoleServiceImpl) UpdateSysRole(sysRole *repository.SysRole) *e.Error
 	return nil
 }
 
-func (r *SysRoleServiceImpl) DeleteSysRole(id uint) *e.Error {
+func (r *SysRoleServiceImpl) DeleteRole(id uint) *e.Error {
 	// 删除删除角色
 	err := r.sysRoleDao.DeleteRoleByID(db.Mysql, id)
 	if err != nil {
@@ -80,7 +80,7 @@ func (r *SysRoleServiceImpl) DeleteSysRole(id uint) *e.Error {
 	return nil
 }
 
-func (s *SysRoleServiceImpl) GetSysRoleList(query *request.PageQuery) (*response.PageInfo, *e.Error) {
+func (s *SysRoleServiceImpl) GetRoleList(query *request.PageQuery) (*response.PageInfo, *e.Error) {
 	var roleQuery *request.SysRoleForList
 	if query.Query != nil {
 		roleQuery = query.Query.(*request.SysRoleForList)

@@ -18,14 +18,14 @@ import (
 type SysUserService interface {
 	// GetUserByID 根据用户id获取用户信息
 	GetUserByID(userID uint) (*repository.SysUser, *e.Error)
-	// InsertSysUser 添加用户
-	InsertSysUser(user *repository.SysUser) (uint, *e.Error)
-	// UpdateSysUser 更新用户，但是不更新密码
-	UpdateSysUser(user *repository.SysUser) *e.Error
-	// DeleteSysUser 删除用户
-	DeleteSysUser(userID uint) *e.Error
-	// GetSysUserList 获取用户列表
-	GetSysUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error)
+	// InsertUser 添加用户
+	InsertUser(user *repository.SysUser) (uint, *e.Error)
+	// UpdateUser 更新用户，但是不更新密码
+	UpdateUser(user *repository.SysUser) *e.Error
+	// DeleteUser 删除用户
+	DeleteUser(userID uint) *e.Error
+	// GetUserList 获取用户列表
+	GetUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error)
 	// UpdateUserRoles 更新角色roleIDs
 	UpdateUserRoles(userID uint, roleIDs []uint) *e.Error
 	// GetRoleIDsByUserID 通过用户id获取所有角色id
@@ -60,7 +60,7 @@ func (s *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, *e.E
 	return user, nil
 }
 
-func (s *SysUserServiceImpl) InsertSysUser(user *repository.SysUser) (uint, *e.Error) {
+func (s *SysUserServiceImpl) InsertUser(user *repository.SysUser) (uint, *e.Error) {
 	// 设置默认用户名
 	if user.UserName == "" {
 		user.UserName = "funcoder"
@@ -94,7 +94,7 @@ func (s *SysUserServiceImpl) InsertSysUser(user *repository.SysUser) (uint, *e.E
 	return user.ID, nil
 }
 
-func (s *SysUserServiceImpl) UpdateSysUser(user *repository.SysUser) *e.Error {
+func (s *SysUserServiceImpl) UpdateUser(user *repository.SysUser) *e.Error {
 	user.UpdatedAt = time.Now()
 	err := s.sysUserDao.UpdateUser(db.Mysql, user)
 	if err != nil {
@@ -103,7 +103,7 @@ func (s *SysUserServiceImpl) UpdateSysUser(user *repository.SysUser) *e.Error {
 	return nil
 }
 
-func (s *SysUserServiceImpl) DeleteSysUser(userID uint) *e.Error {
+func (s *SysUserServiceImpl) DeleteUser(userID uint) *e.Error {
 	err := s.sysUserDao.DeleteUserByID(db.Mysql, userID)
 	if err != nil {
 		return e.ErrMysql
@@ -111,7 +111,7 @@ func (s *SysUserServiceImpl) DeleteSysUser(userID uint) *e.Error {
 	return nil
 }
 
-func (s *SysUserServiceImpl) GetSysUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error) {
+func (s *SysUserServiceImpl) GetUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error) {
 	var pageInfo *response.PageInfo
 	var userQuery *request.SysUserForList
 	if pageQuery.Query != nil {
