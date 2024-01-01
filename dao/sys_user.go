@@ -23,7 +23,7 @@ type SysUserDao interface {
 	// GetUserByEmail 通过邮箱获取用户信息
 	GetUserByEmail(db *gorm.DB, email string) (*repository.SysUser, error)
 	// GetUserList 获取用户列表
-	GetUserList(db *gorm.DB, pageQuery request.PageQuery) ([]*repository.SysUser, error)
+	GetUserList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.SysUser, error)
 	// GetUserCount 获取用户数
 	GetUserCount(db *gorm.DB, user *request.SysUserForList) (int64, error)
 	// CheckLoginName 校验登录名
@@ -85,7 +85,7 @@ func (s *SysUserDaoImpl) GetUserByEmail(db *gorm.DB, email string) (*repository.
 	return user, err
 }
 
-func (s *SysUserDaoImpl) GetUserList(db *gorm.DB, pageQuery request.PageQuery) ([]*repository.SysUser, error) {
+func (s *SysUserDaoImpl) GetUserList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.SysUser, error) {
 	var user *request.SysUserForList
 	if pageQuery.Query != nil {
 		user = pageQuery.Query.(*request.SysUserForList)

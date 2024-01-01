@@ -1,9 +1,12 @@
 package dto
 
-import "funoj-backend/utils"
+import (
+	"funoj-backend/model/repository"
+	"funoj-backend/utils"
+)
 
-// SysUserDtoForList 获取用户列表
-type SysUserDtoForList struct {
+// SysUserDto 用户dto
+type SysUserDto struct {
 	ID        uint       `json:"id"`
 	LoginName string     `json:"loginName"`
 	UserName  string     `json:"username"`
@@ -12,4 +15,22 @@ type SysUserDtoForList struct {
 	Phone     string     `json:"phone"`
 	UpdateAt  utils.Time `json:"updatedAt"`
 	Roles     []string   `json:"roles"`
+}
+
+func NewSysUserDto(user *repository.SysUser) *SysUserDto {
+	response := &SysUserDto{
+		ID:        user.ID,
+		LoginName: user.LoginName,
+		UserName:  user.UserName,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		UpdateAt:  utils.Time(user.UpdatedAt),
+	}
+	if user.Roles != nil {
+		response.Roles = make([]string, len(user.Roles))
+		for i, role := range user.Roles {
+			response.Roles[i] = role.Name
+		}
+	}
+	return response
 }

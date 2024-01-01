@@ -90,8 +90,8 @@ const (
 )
 
 var (
-	ErrApiUnknownError = NewError(CodePermissionUnknownError, "Unknown error", ErrTypeBus)
-	ErrApiNotExist     = NewError(CodePermissionNotExist, "The permission is not exist", ErrTypeBus)
+	ErrPermissionUnknownError = NewError(CodePermissionUnknownError, "Unknown error", ErrTypeBus)
+	ErrPermissionNotExist     = NewError(CodePermissionNotExist, "The permission is not exist", ErrTypeBus)
 )
 
 /************角色管理**************/
