@@ -8,7 +8,7 @@ import (
 	"funoj-backend/db"
 	"funoj-backend/model/dto"
 	"funoj-backend/model/form/request"
-	"funoj-backend/model/form/respnose"
+	"funoj-backend/model/form/response"
 	"funoj-backend/model/repository"
 	"funoj-backend/utils"
 	"gorm.io/gorm"
@@ -25,7 +25,7 @@ type SysUserService interface {
 	// DeleteSysUser 删除用户
 	DeleteSysUser(userID uint) *e.Error
 	// GetSysUserList 获取用户列表
-	GetSysUserList(pageQuery *request.PageQuery) (*respnose.PageInfo, *e.Error)
+	GetSysUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error)
 	// UpdateUserRoles 更新角色roleIDs
 	UpdateUserRoles(userID uint, roleIDs []uint) *e.Error
 	// GetRoleIDsByUserID 通过用户id获取所有角色id
@@ -50,11 +50,12 @@ func NewSysUserService(config *conf.AppConfig, userDao dao.SysUserDao, roleDao d
 
 func (s *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, *e.Error) {
 	user, err := s.sysUserDao.GetUserByID(db.Mysql, userID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, e.ErrUserNotExist
-	}
 	if err != nil {
-		return nil, e.ErrMysql
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, e.ErrUserNotExist
+		} else {
+			return nil, e.ErrMysql
+		}
 	}
 	return user, nil
 }
@@ -110,8 +111,8 @@ func (s *SysUserServiceImpl) DeleteSysUser(userID uint) *e.Error {
 	return nil
 }
 
-func (s *SysUserServiceImpl) GetSysUserList(pageQuery *request.PageQuery) (*respnose.PageInfo, *e.Error) {
-	var pageInfo *respnose.PageInfo
+func (s *SysUserServiceImpl) GetSysUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error) {
+	var pageInfo *response.PageInfo
 	var userQuery *request.SysUserForList
 	if pageQuery.Query != nil {
 		userQuery = pageQuery.Query.(*request.SysUserForList)
@@ -134,7 +135,7 @@ func (s *SysUserServiceImpl) GetSysUserList(pageQuery *request.PageQuery) (*resp
 		if err != nil {
 			return err
 		}
-		pageInfo = &respnose.PageInfo{
+		pageInfo = &response.PageInfo{
 			Total: count,
 			Size:  int64(len(userDtoList)),
 			List:  userDtoList,
