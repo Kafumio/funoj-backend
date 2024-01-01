@@ -2,7 +2,9 @@ package services
 
 import (
 	conf "funoj-backend/config"
+	err "funoj-backend/consts/error"
 	"funoj-backend/dao"
+	"funoj-backend/db"
 	"funoj-backend/model/repository"
 )
 
@@ -23,6 +25,6 @@ func NewSysUserService(config *conf.AppConfig, userDao dao.SysUserDao, roleDao d
 	}
 }
 
-func (s *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, error) {
-
+func (s *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, *err.Error) {
+	user, err := s.sysUserDao.GetUserByID(db.Mysql, userID)
 }
