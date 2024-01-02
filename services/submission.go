@@ -27,7 +27,7 @@ type SubmissionServiceImpl struct {
 	problemDao    dao.ProblemDao
 }
 
-func NewSubmissionDao(submissionDao dao.SubmissionDao, problemDao dao.ProblemDao) SubmissionService {
+func NewSubmissionService(submissionDao dao.SubmissionDao, problemDao dao.ProblemDao) SubmissionService {
 	return &SubmissionServiceImpl{
 		submissionDao: submissionDao,
 		problemDao:    problemDao,
