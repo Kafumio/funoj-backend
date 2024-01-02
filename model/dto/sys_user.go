@@ -17,6 +17,16 @@ type SysUserDto struct {
 	Roles     []string   `json:"roles"`
 }
 
+type UserInfo struct {
+	ID        uint   `json:"id"`
+	Avatar    string `json:"avatar"`
+	LoginName string `json:"loginName"`
+	UserName  string `json:"userName"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Roles     []uint `json:"roles"`
+}
+
 func NewSysUserDto(user *repository.SysUser) *SysUserDto {
 	response := &SysUserDto{
 		ID:        user.ID,
@@ -33,4 +43,20 @@ func NewSysUserDto(user *repository.SysUser) *SysUserDto {
 		}
 	}
 	return response
+}
+
+func NewUserInfo(user *repository.SysUser) *UserInfo {
+	userInfo := &UserInfo{
+		ID:        user.ID,
+		Avatar:    user.Avatar,
+		LoginName: user.LoginName,
+		UserName:  user.UserName,
+		Email:     user.Email,
+		Phone:     user.Phone,
+	}
+	userInfo.Roles = make([]uint, len(user.Roles))
+	for i := 0; i < len(user.Roles); i++ {
+		userInfo.Roles[i] = user.Roles[i].ID
+	}
+	return userInfo
 }

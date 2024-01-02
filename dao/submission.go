@@ -9,11 +9,17 @@ import (
 )
 
 type SubmissionDao interface {
+	// GetLastSubmission 获取最后一次提交情况
 	GetLastSubmission(db *gorm.DB, userID uint, problemID uint) (*repository.Submission, error)
+	// GetSubmissionList 获取提交列表
 	GetSubmissionList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.Submission, error)
+	// GetSubmissionCount 获取提交数
 	GetSubmissionCount(db *gorm.DB, submission *request.SubmissionForList) (int64, error)
+	// GetUserSimpleSubmissionsByTime 获取用户一段时间内的提交概况
 	GetUserSimpleSubmissionsByTime(db *gorm.DB, userID uint, begin time.Time, end time.Time) ([]*repository.Submission, error)
+	// CheckUserIsSubmittedByTime 检验用户是否在一段时间内进行过提交
 	CheckUserIsSubmittedByTime(db *gorm.DB, userID uint, begin time.Time, end time.Time) (bool, error)
+	// InsertSubmission 插入提交记录
 	InsertSubmission(db *gorm.DB, submission *repository.Submission) error
 }
 
