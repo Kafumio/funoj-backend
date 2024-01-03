@@ -24,3 +24,21 @@ func GetGenerateUniqueCode() string {
 	uniqueNumber := strconv.FormatInt(timestamp, 10) + strconv.Itoa(randomNum)
 	return uniqueNumber
 }
+
+func GetCheckNumber(number int) string {
+	randRoot := rand.New(rand.NewSource(time.Now().UnixNano()))
+	a := randRoot.Int31n(1000000)
+	s := strconv.Itoa(int(a))
+	return s[0:number]
+}
+
+func GetRandomPassword(length int) string {
+	baseStr := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	randRoot := rand.New(rand.NewSource(time.Now().UnixNano() + rand.Int63()))
+	bytes := make([]byte, length, length)
+	l := len(baseStr)
+	for i := 0; i < length; i++ {
+		bytes[i] = baseStr[randRoot.Intn(l)]
+	}
+	return string(bytes)
+}
