@@ -11,6 +11,6 @@ type ProblemCase struct {
 	Output    string `gorm:"column:output" json:"output"`
 }
 
-func (p *ProblemCase) TableName() string {
+func (m *ProblemCase) TableName() string {
 	return "problem_case"
 }

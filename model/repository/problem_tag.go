@@ -9,6 +9,6 @@ type ProblemTag struct {
 	Problems []*Problem `gorm:"many2many:problem_menu_association" json:"problems"`
 }
 
-func (p *ProblemTag) TableName() string {
+func (m *ProblemTag) TableName() string {
 	return "problem_tag"
 }

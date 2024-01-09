@@ -2,7 +2,7 @@ package repository
 
 import "gorm.io/gorm"
 
-// 用户在一道题目中的做题情况
+// ProblemAttempt 用户在一道题目中的做题情况
 type ProblemAttempt struct {
 	gorm.Model
 	ProblemID       uint `gorm:"column:problem_id" json:"problemID"`
@@ -17,6 +17,6 @@ type ProblemAttempt struct {
 	Status int `gorm:"column:status" json:"status"`
 }
 
-func (p *ProblemAttempt) TableName() string {
+func (m *ProblemAttempt) TableName() string {
 	return "problem_attempt"
 }

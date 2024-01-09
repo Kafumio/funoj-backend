@@ -12,6 +12,6 @@ type SysPermission struct {
 	Method      string `gorm:"column:method" json:"method"`           // 权限请求方法
 }
 
-func (s *SysPermission) TableName() string {
+func (m *SysPermission) TableName() string {
 	return "permission"
 }

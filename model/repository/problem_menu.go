@@ -12,6 +12,6 @@ type ProblemMenu struct {
 	Problems    []*Problem `gorm:"many2many:problem_menu_association" json:"problems"`
 }
 
-func (p *ProblemMenu) TableName() string {
+func (m *ProblemMenu) TableName() string {
 	return "problem_menu"
 }

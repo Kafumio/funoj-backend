@@ -10,6 +10,6 @@ type SysRole struct {
 	Permissions []*SysPermission `gorm:"many2many:role_permission" json:"permissions"`
 }
 
-func (s *SysRole) TableName() string {
+func (m *SysRole) TableName() string {
 	return "role"
 }

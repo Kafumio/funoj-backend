@@ -32,6 +32,6 @@ type Submission struct {
 	MemoryUsed int64         // 内存使用量（以字节为单位）
 }
 
-func (s *Submission) TableName() string {
+func (m *Submission) TableName() string {
 	return "submission"
 }
