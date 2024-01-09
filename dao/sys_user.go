@@ -51,43 +51,43 @@ func NewSysUserDao() SysUserDao {
 	return &SysUserDaoImpl{}
 }
 
-func (s *SysUserDaoImpl) InsertUser(db *gorm.DB, user *repository.SysUser) error {
+func (dao *SysUserDaoImpl) InsertUser(db *gorm.DB, user *repository.SysUser) error {
 	return db.Create(user).Error
 }
 
-func (s *SysUserDaoImpl) DeleteUserByID(db *gorm.DB, userID uint) error {
+func (dao *SysUserDaoImpl) DeleteUserByID(db *gorm.DB, userID uint) error {
 	return db.Delete(&repository.SysUser{}, "id = ?", userID).Error
 }
 
-func (s *SysUserDaoImpl) UpdateUser(db *gorm.DB, user *repository.SysUser) error {
+func (dao *SysUserDaoImpl) UpdateUser(db *gorm.DB, user *repository.SysUser) error {
 	return db.Model(user).Updates(user).Error
 }
 
-func (s *SysUserDaoImpl) GetUserByID(db *gorm.DB, userID uint) (*repository.SysUser, error) {
+func (dao *SysUserDaoImpl) GetUserByID(db *gorm.DB, userID uint) (*repository.SysUser, error) {
 	user := &repository.SysUser{}
 	err := db.Where("id = ?", userID).Find(&user).Error
 	return user, err
 }
 
-func (s *SysUserDaoImpl) GetUserNameByID(db *gorm.DB, userID uint) (string, error) {
+func (dao *SysUserDaoImpl) GetUserNameByID(db *gorm.DB, userID uint) (string, error) {
 	user := &repository.SysUser{}
 	err := db.Where("id = ?", userID).Select("user_name").Find(&user).Error
 	return user.UserName, err
 }
 
-func (s *SysUserDaoImpl) GetUserByLoginName(db *gorm.DB, loginName string) (*repository.SysUser, error) {
+func (dao *SysUserDaoImpl) GetUserByLoginName(db *gorm.DB, loginName string) (*repository.SysUser, error) {
 	user := &repository.SysUser{}
 	err := db.Where("login_name = ?", loginName).Find(&user).Error
 	return user, err
 }
 
-func (s *SysUserDaoImpl) GetUserByEmail(db *gorm.DB, email string) (*repository.SysUser, error) {
+func (dao *SysUserDaoImpl) GetUserByEmail(db *gorm.DB, email string) (*repository.SysUser, error) {
 	user := &repository.SysUser{}
 	err := db.Where("email = ?", email).Find(&user).Error
 	return user, err
 }
 
-func (s *SysUserDaoImpl) GetUserList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.SysUser, error) {
+func (dao *SysUserDaoImpl) GetUserList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.SysUser, error) {
 	var user *request.SysUserForList
 	if pageQuery.Query != nil {
 		user = pageQuery.Query.(*request.SysUserForList)
@@ -113,7 +113,7 @@ func (s *SysUserDaoImpl) GetUserList(db *gorm.DB, pageQuery *request.PageQuery) 
 	return users, err
 }
 
-func (s *SysUserDaoImpl) GetUserCount(db *gorm.DB, user *request.SysUserForList) (int64, error) {
+func (dao *SysUserDaoImpl) GetUserCount(db *gorm.DB, user *request.SysUserForList) (int64, error) {
 	var count int64
 	if user != nil && user.UserName != "" {
 		db = db.Where("user_name LIKE ?", "%"+user.UserName+"%")
@@ -134,7 +134,7 @@ func (s *SysUserDaoImpl) GetUserCount(db *gorm.DB, user *request.SysUserForList)
 	return count, err
 }
 
-func (s *SysUserDaoImpl) CheckLoginName(db *gorm.DB, loginName string) (bool, error) {
+func (dao *SysUserDaoImpl) CheckLoginName(db *gorm.DB, loginName string) (bool, error) {
 	var user *repository.SysUser
 	err := db.Where("login_name = ?", loginName).First(&user).Error
 	if err != nil {
@@ -146,7 +146,7 @@ func (s *SysUserDaoImpl) CheckLoginName(db *gorm.DB, loginName string) (bool, er
 	return true, nil
 }
 
-func (s *SysUserDaoImpl) ListLoginName(db *gorm.DB, loginName string) ([]string, error) {
+func (dao *SysUserDaoImpl) ListLoginName(db *gorm.DB, loginName string) ([]string, error) {
 	var users []*repository.SysUser
 	err := db.Model(&repository.SysUser{}).Where("login_name like ?", loginName+"%").
 		Select("login_name").Find(&users).Error
@@ -160,7 +160,7 @@ func (s *SysUserDaoImpl) ListLoginName(db *gorm.DB, loginName string) ([]string,
 	return answer, nil
 }
 
-func (s *SysUserDaoImpl) CheckEmail(db *gorm.DB, email string) (bool, error) {
+func (dao *SysUserDaoImpl) CheckEmail(db *gorm.DB, email string) (bool, error) {
 	var user *repository.SysUser
 	err := db.Where("email = ?", email).First(&user).Error
 	if err != nil {
@@ -172,7 +172,7 @@ func (s *SysUserDaoImpl) CheckEmail(db *gorm.DB, email string) (bool, error) {
 	return user.ID != 0, nil
 }
 
-func (s *SysUserDaoImpl) DeleteUserRoleByUserID(db *gorm.DB, userID uint) error {
+func (dao *SysUserDaoImpl) DeleteUserRoleByUserID(db *gorm.DB, userID uint) error {
 	user := repository.SysUser{}
 	user.ID = userID
 	if err := db.Model(&user).Association("Roles").Clear(); err != nil {
@@ -181,7 +181,7 @@ func (s *SysUserDaoImpl) DeleteUserRoleByUserID(db *gorm.DB, userID uint) error 
 	return nil
 }
 
-func (s *SysUserDaoImpl) GetRolesByUserID(db *gorm.DB, userID uint) ([]*repository.SysRole, error) {
+func (dao *SysUserDaoImpl) GetRolesByUserID(db *gorm.DB, userID uint) ([]*repository.SysRole, error) {
 	user := repository.SysUser{}
 	user.ID = userID
 	if err := db.Model(&user).Association("Roles").Find(&user.Roles); err != nil {
@@ -190,7 +190,7 @@ func (s *SysUserDaoImpl) GetRolesByUserID(db *gorm.DB, userID uint) ([]*reposito
 	return user.Roles, nil
 }
 
-func (s *SysUserDaoImpl) GetRoleIDsByUserID(db *gorm.DB, userID uint) ([]uint, error) {
+func (dao *SysUserDaoImpl) GetRoleIDsByUserID(db *gorm.DB, userID uint) ([]uint, error) {
 	user := repository.SysUser{}
 	user.ID = userID
 	if err := db.Model(&user).Association("Roles").Find(&user.Roles); err != nil {
@@ -203,7 +203,7 @@ func (s *SysUserDaoImpl) GetRoleIDsByUserID(db *gorm.DB, userID uint) ([]uint, e
 	return roleIDs, nil
 }
 
-func (s *SysUserDaoImpl) InsertRolesToUser(db *gorm.DB, userID uint, roleIDs []uint) error {
+func (dao *SysUserDaoImpl) InsertRolesToUser(db *gorm.DB, userID uint, roleIDs []uint) error {
 	user := &repository.SysUser{}
 	user.ID = userID
 	for _, roleID := range roleIDs {
@@ -217,7 +217,7 @@ func (s *SysUserDaoImpl) InsertRolesToUser(db *gorm.DB, userID uint, roleIDs []u
 	return nil
 }
 
-func (s *SysUserDaoImpl) UpdateUserPassword(db *gorm.DB, userID uint, password string) error {
+func (dao *SysUserDaoImpl) UpdateUserPassword(db *gorm.DB, userID uint, password string) error {
 	user := repository.SysUser{}
 	user.ID = userID
 	return db.Model(&user).Update("password", password).Error

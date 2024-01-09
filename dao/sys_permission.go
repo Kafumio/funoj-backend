@@ -31,37 +31,37 @@ func NewSysPermissionDao() SysPermissionDao {
 	return &SysPermissionDaoImpl{}
 }
 
-func (s *SysPermissionDaoImpl) InsertPermission(db *gorm.DB, permission *repository.SysPermission) error {
+func (dao *SysPermissionDaoImpl) InsertPermission(db *gorm.DB, permission *repository.SysPermission) error {
 	return db.Create(permission).Error
 }
 
-func (s *SysPermissionDaoImpl) UpdatePermission(db *gorm.DB, permission *repository.SysPermission) error {
+func (dao *SysPermissionDaoImpl) UpdatePermission(db *gorm.DB, permission *repository.SysPermission) error {
 	return db.Model(permission).Updates(permission).Error
 }
 
-func (s *SysPermissionDaoImpl) DeletePermissionByID(db *gorm.DB, id uint) error {
+func (dao *SysPermissionDaoImpl) DeletePermissionByID(db *gorm.DB, id uint) error {
 	return db.Delete(&repository.SysPermission{}, id).Error
 }
 
-func (s *SysPermissionDaoImpl) GetAllPermission(db *gorm.DB) ([]*repository.SysPermission, error) {
+func (dao *SysPermissionDaoImpl) GetAllPermission(db *gorm.DB) ([]*repository.SysPermission, error) {
 	var permissionList []*repository.SysPermission
 	err := db.Find(&permissionList).Error
 	return permissionList, err
 }
 
-func (s *SysPermissionDaoImpl) GetPermissionByID(db *gorm.DB, id uint) (*repository.SysPermission, error) {
+func (dao *SysPermissionDaoImpl) GetPermissionByID(db *gorm.DB, id uint) (*repository.SysPermission, error) {
 	var permission *repository.SysPermission
 	err := db.Find(&permission).Error
 	return permission, err
 }
 
-func (s *SysPermissionDaoImpl) GetPermissionCount(db *gorm.DB) (int64, error) {
+func (dao *SysPermissionDaoImpl) GetPermissionCount(db *gorm.DB) (int64, error) {
 	var count int64
 	err := db.Model(&repository.SysPermission{}).Count(&count).Error
 	return count, err
 }
 
-func (s *SysPermissionDaoImpl) GetPermissionListByPathKeyword(db *gorm.DB, keyword string, page int, pageSize int) ([]*repository.SysPermission, error) {
+func (dao *SysPermissionDaoImpl) GetPermissionListByPathKeyword(db *gorm.DB, keyword string, page int, pageSize int) ([]*repository.SysPermission, error) {
 	var permissions []*repository.SysPermission
 	err := db.Where("path LIKE ?", "%"+keyword+"%").Offset((page - 1) * pageSize).Limit(pageSize).Find(&permissions).Error
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *SysPermissionDaoImpl) GetPermissionListByPathKeyword(db *gorm.DB, keywo
 	return permissions, nil
 }
 
-func (s *SysPermissionDaoImpl) GetChildPermissionsByParentID(db *gorm.DB, parentID uint) ([]*repository.SysPermission, error) {
+func (dao *SysPermissionDaoImpl) GetChildPermissionsByParentID(db *gorm.DB, parentID uint) ([]*repository.SysPermission, error) {
 	var childPermissions []*repository.SysPermission
 	if err := db.Where("parent_id = ?", parentID).Find(&childPermissions).Error; err != nil {
 		return nil, err

@@ -31,7 +31,7 @@ func NewProblemCaseDao() ProblemCaseDao {
 	return &ProblemCaseDaoImpl{}
 }
 
-func (p *ProblemCaseDaoImpl) GetProblemCaseList(db *gorm.DB, query *request.PageQuery) ([]*repository.ProblemCase, error) {
+func (dao *ProblemCaseDaoImpl) GetProblemCaseList(db *gorm.DB, query *request.PageQuery) ([]*repository.ProblemCase, error) {
 	var problemCase *request.ProblemCaseForList
 	if query.Query != nil {
 		problemCase = query.Query.(*request.ProblemCaseForList)
@@ -53,14 +53,14 @@ func (p *ProblemCaseDaoImpl) GetProblemCaseList(db *gorm.DB, query *request.Page
 	return cases, err
 }
 
-func (p *ProblemCaseDaoImpl) GetAllProblemCaseByID(db *gorm.DB, problemID uint) ([]*repository.ProblemCase, error) {
+func (dao *ProblemCaseDaoImpl) GetAllProblemCaseByID(db *gorm.DB, problemID uint) ([]*repository.ProblemCase, error) {
 	db = db.Where("problem_id = ?", problemID)
 	var cases []*repository.ProblemCase
 	err := db.Find(&cases).Error
 	return cases, err
 }
 
-func (p *ProblemCaseDaoImpl) GetProblemCaseCount(db *gorm.DB, problemCase *request.ProblemCaseForList) (int64, error) {
+func (dao *ProblemCaseDaoImpl) GetProblemCaseCount(db *gorm.DB, problemCase *request.ProblemCaseForList) (int64, error) {
 	var count int64
 	if problemCase != nil && problemCase.ProblemID != 0 {
 		db = db.Where("problem_id = ?", problemCase.ProblemID)
@@ -72,24 +72,24 @@ func (p *ProblemCaseDaoImpl) GetProblemCaseCount(db *gorm.DB, problemCase *reque
 	return count, err
 }
 
-func (p *ProblemCaseDaoImpl) GetProblemCaseByID(db *gorm.DB, id uint) (*repository.ProblemCase, error) {
+func (dao *ProblemCaseDaoImpl) GetProblemCaseByID(db *gorm.DB, id uint) (*repository.ProblemCase, error) {
 	problemCase := &repository.ProblemCase{}
 	err := db.Where("id = ?", id).Find(&problemCase).Error
 	return problemCase, err
 }
 
-func (p *ProblemCaseDaoImpl) DeleteProblemCaseByID(db *gorm.DB, id uint) error {
+func (dao *ProblemCaseDaoImpl) DeleteProblemCaseByID(db *gorm.DB, id uint) error {
 	return db.Delete(&repository.ProblemCase{}, id).Error
 }
 
-func (p *ProblemCaseDaoImpl) DeleteProblemCaseByProblemID(db *gorm.DB, problemID uint) error {
+func (dao *ProblemCaseDaoImpl) DeleteProblemCaseByProblemID(db *gorm.DB, problemID uint) error {
 	return db.Where("problem_id = ?", problemID).Delete(&repository.ProblemCase{}).Error
 }
 
-func (p *ProblemCaseDaoImpl) InsertProblemCase(db *gorm.DB, problemCase *repository.ProblemCase) error {
+func (dao *ProblemCaseDaoImpl) InsertProblemCase(db *gorm.DB, problemCase *repository.ProblemCase) error {
 	return db.Create(problemCase).Error
 }
 
-func (p *ProblemCaseDaoImpl) UpdateProblemCase(db *gorm.DB, problemCase *repository.ProblemCase) error {
+func (dao *ProblemCaseDaoImpl) UpdateProblemCase(db *gorm.DB, problemCase *repository.ProblemCase) error {
 	return db.Model(problemCase).Updates(problemCase).Error
 }

@@ -155,7 +155,7 @@ func (dao *ProblemDaoImpl) UpdateProblemField(db *gorm.DB, id uint, field string
 	return nil
 }
 
-func (p *ProblemDaoImpl) CheckProblemNumberExists(db *gorm.DB, problemNumber string) (bool, error) {
+func (dao *ProblemDaoImpl) CheckProblemNumberExists(db *gorm.DB, problemNumber string) (bool, error) {
 	//执行
 	row := db.Model(&repository.Problem{}).Select("number").Where("number = ?", problemNumber)
 	if row.Error != nil {
@@ -166,10 +166,10 @@ func (p *ProblemDaoImpl) CheckProblemNumberExists(db *gorm.DB, problemNumber str
 	return problem.Number != "", nil
 }
 
-func (p *ProblemDaoImpl) SetProblemEnable(db *gorm.DB, id uint, enable int) error {
+func (dao *ProblemDaoImpl) SetProblemEnable(db *gorm.DB, id uint, enable int) error {
 	return db.Model(&repository.Problem{}).Where("id = ?", id).Update("enable", enable).Error
 }
 
-func (p *ProblemDaoImpl) DeleteProblemByID(db *gorm.DB, id uint) error {
+func (dao *ProblemDaoImpl) DeleteProblemByID(db *gorm.DB, id uint) error {
 	return db.Delete(&repository.Problem{}, id).Error
 }

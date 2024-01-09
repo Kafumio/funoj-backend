@@ -38,25 +38,25 @@ func NewSysRoleDao() SysRoleDao {
 	return &SysRoleDaoImpl{}
 }
 
-func (s *SysRoleDaoImpl) InsertRole(db *gorm.DB, role *repository.SysRole) error {
+func (dao *SysRoleDaoImpl) InsertRole(db *gorm.DB, role *repository.SysRole) error {
 	return db.Create(role).Error
 }
 
-func (s *SysRoleDaoImpl) UpdateRole(db *gorm.DB, role *repository.SysRole) error {
+func (dao *SysRoleDaoImpl) UpdateRole(db *gorm.DB, role *repository.SysRole) error {
 	return db.Model(role).Updates(role).Error
 }
 
-func (s *SysRoleDaoImpl) DeleteRoleByID(db *gorm.DB, id uint) error {
+func (dao *SysRoleDaoImpl) DeleteRoleByID(db *gorm.DB, id uint) error {
 	return db.Delete(&repository.SysRole{}, id).Error
 }
 
-func (s *SysRoleDaoImpl) GetRoleByID(db *gorm.DB, id uint) (*repository.SysRole, error) {
+func (dao *SysRoleDaoImpl) GetRoleByID(db *gorm.DB, id uint) (*repository.SysRole, error) {
 	role := &repository.SysRole{}
 	err := db.Where("id = ?", id).Find(&role).Error
 	return role, err
 }
 
-func (r *SysRoleDaoImpl) GetRoleList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.SysRole, error) {
+func (dao *SysRoleDaoImpl) GetRoleList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.SysRole, error) {
 	var role *request.SysRoleForList
 	if pageQuery.Query != nil {
 		role = pageQuery.Query.(*request.SysRoleForList)
@@ -78,7 +78,7 @@ func (r *SysRoleDaoImpl) GetRoleList(db *gorm.DB, pageQuery *request.PageQuery) 
 	return roles, err
 }
 
-func (s *SysRoleDaoImpl) GetRoleCount(db *gorm.DB, role *request.SysRoleForList) (int64, error) {
+func (dao *SysRoleDaoImpl) GetRoleCount(db *gorm.DB, role *request.SysRoleForList) (int64, error) {
 	var count int64
 	if role != nil && role.Name != "" {
 		db = db.Where("name LIKE ?", "%"+role.Name+"%")
@@ -90,7 +90,7 @@ func (s *SysRoleDaoImpl) GetRoleCount(db *gorm.DB, role *request.SysRoleForList)
 	return count, err
 }
 
-func (s *SysRoleDaoImpl) GrantPermissionsToRole(db *gorm.DB, roleID uint, permissionIDs []uint) error {
+func (dao *SysRoleDaoImpl) GrantPermissionsToRole(db *gorm.DB, roleID uint, permissionIDs []uint) error {
 	role := &repository.SysRole{}
 	role.ID = roleID
 	var permissions []repository.SysPermission
@@ -103,14 +103,14 @@ func (s *SysRoleDaoImpl) GrantPermissionsToRole(db *gorm.DB, roleID uint, permis
 	return err
 }
 
-func (s *SysRoleDaoImpl) DisGrantPermissionsByRoleID(db *gorm.DB, roleID uint) error {
+func (dao *SysRoleDaoImpl) DisGrantPermissionsByRoleID(db *gorm.DB, roleID uint) error {
 	role := repository.SysRole{}
 	role.ID = roleID
 	err := db.Model(&role).Association("Permissions").Clear()
 	return err
 }
 
-func (s *SysRoleDaoImpl) GetPermissionIDsByRoleID(db *gorm.DB, roleID uint) ([]uint, error) {
+func (dao *SysRoleDaoImpl) GetPermissionIDsByRoleID(db *gorm.DB, roleID uint) ([]uint, error) {
 	var role repository.SysRole
 	role.ID = roleID
 	if err := db.Model(&role).Association("Permissions").Find(&role.Permissions); err != nil {
@@ -123,7 +123,7 @@ func (s *SysRoleDaoImpl) GetPermissionIDsByRoleID(db *gorm.DB, roleID uint) ([]u
 	return permissionIDs, nil
 }
 
-func (s *SysRoleDaoImpl) GetPermissionsByRoleID(db *gorm.DB, roleID uint) ([]*repository.SysPermission, error) {
+func (dao *SysRoleDaoImpl) GetPermissionsByRoleID(db *gorm.DB, roleID uint) ([]*repository.SysPermission, error) {
 	role := repository.SysRole{}
 	role.ID = roleID
 	if err := db.Model(&role).Association("Permissions").Find(&role.Permissions); err != nil {
@@ -132,7 +132,7 @@ func (s *SysRoleDaoImpl) GetPermissionsByRoleID(db *gorm.DB, roleID uint) ([]*re
 	return role.Permissions, nil
 }
 
-func (r *SysRoleDaoImpl) GetAllSimpleRoleList(db *gorm.DB) ([]*repository.SysRole, error) {
+func (dao *SysRoleDaoImpl) GetAllSimpleRoleList(db *gorm.DB) ([]*repository.SysRole, error) {
 	var roles []*repository.SysRole
 	err := db.Select([]string{"id", "name"}).Find(&roles).Error
 	if err != nil {

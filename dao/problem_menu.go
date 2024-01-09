@@ -32,25 +32,25 @@ func NewProblemMenuDao() ProblemMenuDao {
 	return &ProblemMenuDaoImpl{}
 }
 
-func (p *ProblemMenuDaoImpl) InsertProblemMenu(db *gorm.DB, problemMenu *repository.ProblemMenu) error {
+func (dao *ProblemMenuDaoImpl) InsertProblemMenu(db *gorm.DB, problemMenu *repository.ProblemMenu) error {
 	return db.Create(problemMenu).Error
 }
 
-func (p *ProblemMenuDaoImpl) GetProblemMenuByID(db *gorm.DB, id uint) (*repository.ProblemMenu, error) {
+func (dao *ProblemMenuDaoImpl) GetProblemMenuByID(db *gorm.DB, id uint) (*repository.ProblemMenu, error) {
 	problemMenu := &repository.ProblemMenu{}
 	err := db.Where("id = ?", id).Find(&problemMenu).Error
 	return problemMenu, err
 }
 
-func (p *ProblemMenuDaoImpl) UpdateProblemMenu(db *gorm.DB, problemMenu *repository.ProblemMenu) error {
+func (dao *ProblemMenuDaoImpl) UpdateProblemMenu(db *gorm.DB, problemMenu *repository.ProblemMenu) error {
 	return db.Model(problemMenu).Updates(problemMenu).Error
 }
 
-func (p *ProblemMenuDaoImpl) DeleteProblemMenuByID(db *gorm.DB, id uint) error {
+func (dao *ProblemMenuDaoImpl) DeleteProblemMenuByID(db *gorm.DB, id uint) error {
 	return db.Delete(&repository.ProblemMenu{}, id).Error
 }
 
-func (p *ProblemMenuDaoImpl) GetProblemMenuCount(db *gorm.DB, problemMenu *request.ProblemMenuForList) (int64, error) {
+func (dao *ProblemMenuDaoImpl) GetProblemMenuCount(db *gorm.DB, problemMenu *request.ProblemMenuForList) (int64, error) {
 	var count int64
 	if problemMenu != nil && problemMenu.Name != "" {
 		db = db.Where("name like ?", "%"+problemMenu.Name+"%")
@@ -62,7 +62,7 @@ func (p *ProblemMenuDaoImpl) GetProblemMenuCount(db *gorm.DB, problemMenu *reque
 	return count, err
 }
 
-func (p *ProblemMenuDaoImpl) GetProblemMenuList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.ProblemMenu, error) {
+func (dao *ProblemMenuDaoImpl) GetProblemMenuList(db *gorm.DB, pageQuery *request.PageQuery) ([]*repository.ProblemMenu, error) {
 	var problemMenu *request.ProblemMenuForList
 	if pageQuery.Query != nil {
 		problemMenu = pageQuery.Query.(*request.ProblemMenuForList)
@@ -84,13 +84,13 @@ func (p *ProblemMenuDaoImpl) GetProblemMenuList(db *gorm.DB, pageQuery *request.
 	return menus, err
 }
 
-func (p *ProblemMenuDaoImpl) GetAllProblemMenu(db *gorm.DB) ([]*repository.ProblemMenu, error) {
+func (dao *ProblemMenuDaoImpl) GetAllProblemMenu(db *gorm.DB) ([]*repository.ProblemMenu, error) {
 	var menus []*repository.ProblemMenu
 	err := db.Find(&menus).Error
 	return menus, err
 }
 
-func (p *ProblemMenuDaoImpl) GetSimpleProblemMenuList(db *gorm.DB) ([]*repository.ProblemMenu, error) {
+func (dao *ProblemMenuDaoImpl) GetSimpleProblemMenuList(db *gorm.DB) ([]*repository.ProblemMenu, error) {
 	var menus []*repository.ProblemMenu
 	err := db.Select("id", "name").Find(&menus).Error
 	return menus, err
