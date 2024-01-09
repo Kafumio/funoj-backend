@@ -48,8 +48,8 @@ func NewSysUserService(config *conf.AppConfig, userDao dao.SysUserDao, roleDao d
 	}
 }
 
-func (s *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, *e.Error) {
-	user, err := s.sysUserDao.GetUserByID(db.Mysql, userID)
+func (svc *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, *e.Error) {
+	user, err := svc.sysUserDao.GetUserByID(db.Mysql, userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.ErrUserNotExist
@@ -60,7 +60,7 @@ func (s *SysUserServiceImpl) GetUserByID(userID uint) (*repository.SysUser, *e.E
 	return user, nil
 }
 
-func (s *SysUserServiceImpl) InsertUser(user *repository.SysUser) (uint, *e.Error) {
+func (svc *SysUserServiceImpl) InsertUser(user *repository.SysUser) (uint, *e.Error) {
 	// 设置默认用户名
 	if user.UserName == "" {
 		user.UserName = "funcoder"
@@ -71,7 +71,7 @@ func (s *SysUserServiceImpl) InsertUser(user *repository.SysUser) (uint, *e.Erro
 	}
 	// 设置默认密码
 	if user.Password == "" {
-		user.Password = s.config.DefaultPassword
+		user.Password = svc.config.DefaultPassword
 	}
 	// 设置默认出生时间
 	t := time.Time{}
@@ -87,51 +87,51 @@ func (s *SysUserServiceImpl) InsertUser(user *repository.SysUser) (uint, *e.Erro
 		return 0, e.ErrMysql
 	}
 	user.Password = string(p)
-	err = s.sysUserDao.InsertUser(db.Mysql, user)
+	err = svc.sysUserDao.InsertUser(db.Mysql, user)
 	if err != nil {
 		return 0, e.ErrMysql
 	}
 	return user.ID, nil
 }
 
-func (s *SysUserServiceImpl) UpdateUser(user *repository.SysUser) *e.Error {
+func (svc *SysUserServiceImpl) UpdateUser(user *repository.SysUser) *e.Error {
 	user.UpdatedAt = time.Now()
-	err := s.sysUserDao.UpdateUser(db.Mysql, user)
+	err := svc.sysUserDao.UpdateUser(db.Mysql, user)
 	if err != nil {
 		return e.ErrMysql
 	}
 	return nil
 }
 
-func (s *SysUserServiceImpl) DeleteUser(userID uint) *e.Error {
-	err := s.sysUserDao.DeleteUserByID(db.Mysql, userID)
+func (svc *SysUserServiceImpl) DeleteUser(userID uint) *e.Error {
+	err := svc.sysUserDao.DeleteUserByID(db.Mysql, userID)
 	if err != nil {
 		return e.ErrMysql
 	}
 	return nil
 }
 
-func (s *SysUserServiceImpl) GetUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error) {
+func (svc *SysUserServiceImpl) GetUserList(pageQuery *request.PageQuery) (*response.PageInfo, *e.Error) {
 	var pageInfo *response.PageInfo
 	var userQuery *request.SysUserForList
 	if pageQuery.Query != nil {
 		userQuery = pageQuery.Query.(*request.SysUserForList)
 	}
 	err := db.Mysql.Transaction(func(tx *gorm.DB) error {
-		userList, err := s.sysUserDao.GetUserList(tx, pageQuery)
+		userList, err := svc.sysUserDao.GetUserList(tx, pageQuery)
 		if err != nil {
 			return err
 		}
 		userDtoList := make([]*dto.SysUserDto, len(userList))
 		for i, user := range userList {
-			user.Roles, err = s.sysUserDao.GetRolesByUserID(tx, user.ID)
+			user.Roles, err = svc.sysUserDao.GetRolesByUserID(tx, user.ID)
 			if err != nil {
 				return err
 			}
 			userDtoList[i] = dto.NewSysUserDto(user)
 		}
 		var count int64
-		count, err = s.sysUserDao.GetUserCount(tx, userQuery)
+		count, err = svc.sysUserDao.GetUserCount(tx, userQuery)
 		if err != nil {
 			return err
 		}
@@ -148,14 +148,14 @@ func (s *SysUserServiceImpl) GetUserList(pageQuery *request.PageQuery) (*respons
 	return pageInfo, nil
 }
 
-func (s *SysUserServiceImpl) UpdateUserRoles(userID uint, roleIDs []uint) *e.Error {
+func (svc *SysUserServiceImpl) UpdateUserRoles(userID uint, roleIDs []uint) *e.Error {
 	tx := db.Mysql.Begin()
-	err := s.sysUserDao.DeleteUserRoleByUserID(tx, userID)
+	err := svc.sysUserDao.DeleteUserRoleByUserID(tx, userID)
 	if err != nil {
 		tx.Rollback()
 		return e.ErrMysql
 	}
-	err = s.sysUserDao.InsertRolesToUser(tx, userID, roleIDs)
+	err = svc.sysUserDao.InsertRolesToUser(tx, userID, roleIDs)
 	if err != nil {
 		tx.Rollback()
 		return e.ErrMysql
@@ -164,16 +164,16 @@ func (s *SysUserServiceImpl) UpdateUserRoles(userID uint, roleIDs []uint) *e.Err
 	return nil
 }
 
-func (s *SysUserServiceImpl) GetRoleIDsByUserID(userID uint) ([]uint, *e.Error) {
-	roleIDs, err := s.sysUserDao.GetRoleIDsByUserID(db.Mysql, userID)
+func (svc *SysUserServiceImpl) GetRoleIDsByUserID(userID uint) ([]uint, *e.Error) {
+	roleIDs, err := svc.sysUserDao.GetRoleIDsByUserID(db.Mysql, userID)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
 	return roleIDs, nil
 }
 
-func (s *SysUserServiceImpl) GetAllSimpleRole() ([]*dto.SimpleRoleDto, *e.Error) {
-	roles, err := s.sysRoleDao.GetAllSimpleRoleList(db.Mysql)
+func (svc *SysUserServiceImpl) GetAllSimpleRole() ([]*dto.SimpleRoleDto, *e.Error) {
+	roles, err := svc.sysRoleDao.GetAllSimpleRoleList(db.Mysql)
 	if err != nil {
 		return nil, e.ErrMysql
 	}

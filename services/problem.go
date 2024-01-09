@@ -57,15 +57,15 @@ func NewProblemService(config *conf.AppConfig, problemDao dao.ProblemDao, proble
 	}
 }
 
-func (p *ProblemServiceImpl) CheckProblemNumber(problemCode string) (bool, *e.Error) {
-	b, err := p.problemDao.CheckProblemNumberExists(db.Mysql, problemCode)
+func (svc *ProblemServiceImpl) CheckProblemNumber(problemCode string) (bool, *e.Error) {
+	b, err := svc.problemDao.CheckProblemNumberExists(db.Mysql, problemCode)
 	if err != nil {
 		return !b, e.ErrProblemCodeCheckFailed
 	}
 	return !b, nil
 }
 
-func (p *ProblemServiceImpl) InsertProblem(ctx *gin.Context, problem *repository.Problem) (uint, *e.Error) {
+func (svc *ProblemServiceImpl) InsertProblem(ctx *gin.Context, problem *repository.Problem) (uint, *e.Error) {
 	problem.CreatorID = ctx.Keys["user"].(*dto.UserInfo).ID
 	// 对设置值的数据设置默认值
 	if problem.Name == "" {
@@ -75,7 +75,7 @@ func (p *ProblemServiceImpl) InsertProblem(ctx *gin.Context, problem *repository
 		problem.Title = "标题信息"
 	}
 	if problem.Description == "" {
-		problemDescription, err := os.ReadFile(p.config.FilePathConfig.ProblemDescriptionTemplate)
+		problemDescription, err := os.ReadFile(svc.config.FilePathConfig.ProblemDescriptionTemplate)
 		if err != nil {
 			return 0, e.ErrProblemInsertFailed
 		}
@@ -86,7 +86,7 @@ func (p *ProblemServiceImpl) InsertProblem(ctx *gin.Context, problem *repository
 	}
 	// 检测编号是否重复
 	if problem.Number != "" {
-		b, checkError := p.problemDao.CheckProblemNumberExists(db.Mysql, problem.Number)
+		b, checkError := svc.problemDao.CheckProblemNumberExists(db.Mysql, problem.Number)
 		if checkError != nil {
 			return 0, e.ErrMysql
 		}
@@ -100,25 +100,25 @@ func (p *ProblemServiceImpl) InsertProblem(ctx *gin.Context, problem *repository
 	}
 	problem.Enable = -1
 	// 添加
-	err := p.problemDao.InsertProblem(db.Mysql, problem)
+	err := svc.problemDao.InsertProblem(db.Mysql, problem)
 	if err != nil {
 		return 0, e.ErrMysql
 	}
 	return problem.ID, nil
 }
 
-func (p *ProblemServiceImpl) UpdateProblem(problem *repository.Problem) *e.Error {
+func (svc *ProblemServiceImpl) UpdateProblem(problem *repository.Problem) *e.Error {
 	problem.UpdatedAt = time.Now()
-	if err := p.problemDao.UpdateProblem(db.Mysql, problem); err != nil {
+	if err := svc.problemDao.UpdateProblem(db.Mysql, problem); err != nil {
 		log.Println(err)
 		return e.ErrProblemUpdateFailed
 	}
 	return nil
 }
 
-func (p *ProblemServiceImpl) DeleteProblem(id uint) *e.Error {
+func (svc *ProblemServiceImpl) DeleteProblem(id uint) *e.Error {
 	// 读取Problem
-	problem, err := p.problemDao.GetProblemByID(db.Mysql, id)
+	problem, err := svc.problemDao.GetProblemByID(db.Mysql, id)
 	if err != nil {
 		return e.ErrMysql
 	}
@@ -126,23 +126,23 @@ func (p *ProblemServiceImpl) DeleteProblem(id uint) *e.Error {
 		return e.ErrProblemNotExist
 	}
 	// 删除用例
-	if err = p.problemCaseDao.DeleteProblemCaseByProblemID(db.Mysql, id); err != nil {
+	if err = svc.problemCaseDao.DeleteProblemCaseByProblemID(db.Mysql, id); err != nil {
 		return e.ErrMysql
 	}
 	// 删除题目
-	if err = p.problemDao.DeleteProblemByID(db.Mysql, id); err != nil {
+	if err = svc.problemDao.DeleteProblemByID(db.Mysql, id); err != nil {
 		return e.ErrMysql
 	}
 	return nil
 }
 
-func (p *ProblemServiceImpl) GetProblemList(query *request.PageQuery) (*response.PageInfo, *e.Error) {
+func (svc *ProblemServiceImpl) GetProblemList(query *request.PageQuery) (*response.PageInfo, *e.Error) {
 	var problemQuery *request.ProblemForList
 	if query.Query != nil {
 		problemQuery = query.Query.(*request.ProblemForList)
 	}
 	// 获取题目列表
-	problems, err := p.problemDao.GetProblemList(db.Mysql, query)
+	problems, err := svc.problemDao.GetProblemList(db.Mysql, query)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
@@ -152,7 +152,7 @@ func (p *ProblemServiceImpl) GetProblemList(query *request.PageQuery) (*response
 	}
 	// 获取所有题目总数目
 	var count int64
-	count, err = p.problemDao.GetProblemCount(db.Mysql, problemQuery)
+	count, err = svc.problemDao.GetProblemCount(db.Mysql, problemQuery)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
@@ -164,7 +164,7 @@ func (p *ProblemServiceImpl) GetProblemList(query *request.PageQuery) (*response
 	return pageInfo, nil
 }
 
-func (p *ProblemServiceImpl) GetUserProblemList(ctx *gin.Context, query *request.PageQuery) (*response.PageInfo, *e.Error) {
+func (svc *ProblemServiceImpl) GetUserProblemList(ctx *gin.Context, query *request.PageQuery) (*response.PageInfo, *e.Error) {
 	userId := ctx.Keys["user"].(*dto.UserInfo).ID
 	if query.Query != nil {
 		query.Query.(*request.ProblemForList).Enable = 1
@@ -174,7 +174,7 @@ func (p *ProblemServiceImpl) GetUserProblemList(ctx *gin.Context, query *request
 		}
 	}
 	// 获取题目列表
-	problems, err := p.problemDao.GetProblemList(db.Mysql, query)
+	problems, err := svc.problemDao.GetProblemList(db.Mysql, query)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
@@ -183,7 +183,7 @@ func (p *ProblemServiceImpl) GetUserProblemList(ctx *gin.Context, query *request
 		newProblems[i] = dto.NewProblemDtoForUserList(problems[i])
 		// 读取题目完成情况
 		var status int
-		status, err = p.problemAttemptDao.GetProblemAttemptStatus(db.Mysql, userId, problems[i].ID)
+		status, err = svc.problemAttemptDao.GetProblemAttemptStatus(db.Mysql, userId, problems[i].ID)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.ErrProblemListFailed
 		}
@@ -191,7 +191,7 @@ func (p *ProblemServiceImpl) GetUserProblemList(ctx *gin.Context, query *request
 	}
 	// 获取所有题目总数目
 	var count int64
-	count, err = p.problemDao.GetProblemCount(db.Mysql, query.Query.(*request.ProblemForList))
+	count, err = svc.problemDao.GetProblemCount(db.Mysql, query.Query.(*request.ProblemForList))
 	if err != nil {
 		return nil, e.ErrMysql
 	}
@@ -203,8 +203,8 @@ func (p *ProblemServiceImpl) GetUserProblemList(ctx *gin.Context, query *request
 	return pageInfo, nil
 }
 
-func (p *ProblemServiceImpl) GetProblemByID(id uint) (*dto.ProblemDtoForGet, *e.Error) {
-	problem, err := p.problemDao.GetProblemByID(db.Mysql, id)
+func (svc *ProblemServiceImpl) GetProblemByID(id uint) (*dto.ProblemDtoForGet, *e.Error) {
+	problem, err := svc.problemDao.GetProblemByID(db.Mysql, id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, e.ErrProblemNotExist
 	}
@@ -214,8 +214,8 @@ func (p *ProblemServiceImpl) GetProblemByID(id uint) (*dto.ProblemDtoForGet, *e.
 	return dto.NewProblemDtoForGet(problem), nil
 }
 
-func (p *ProblemServiceImpl) GetProblemByNumber(number string) (*dto.ProblemDtoForGet, *e.Error) {
-	problem, err := p.problemDao.GetProblemByNumber(db.Mysql, number)
+func (svc *ProblemServiceImpl) GetProblemByNumber(number string) (*dto.ProblemDtoForGet, *e.Error) {
+	problem, err := svc.problemDao.GetProblemByNumber(db.Mysql, number)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, e.ErrProblemNotExist
 	}
@@ -225,7 +225,7 @@ func (p *ProblemServiceImpl) GetProblemByNumber(number string) (*dto.ProblemDtoF
 	return dto.NewProblemDtoForGet(problem), nil
 }
 
-func (p *ProblemServiceImpl) GetProblemTemplateCode(problemID uint, language string) (string, *e.Error) {
+func (svc *ProblemServiceImpl) GetProblemTemplateCode(problemID uint, language string) (string, *e.Error) {
 	// 读取acm模板
 	code, err := utils.GetAcmCodeTemplate(language)
 	if err != nil {
@@ -235,8 +235,8 @@ func (p *ProblemServiceImpl) GetProblemTemplateCode(problemID uint, language str
 }
 
 // todo: 是否要加事务
-func (p *ProblemServiceImpl) UpdateProblemEnable(id uint, enable int) *e.Error {
-	if err := p.problemDao.SetProblemEnable(db.Mysql, id, enable); err != nil {
+func (svc *ProblemServiceImpl) UpdateProblemEnable(id uint, enable int) *e.Error {
+	if err := svc.problemDao.SetProblemEnable(db.Mysql, id, enable); err != nil {
 		return e.ErrMysql
 	}
 	return nil

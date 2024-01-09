@@ -35,18 +35,18 @@ func NewSysPermissionService(permissionDao dao.SysPermissionDao) SysPermissionSe
 	}
 }
 
-func (s *SysPermissionServiceImpl) GetPermissionCount() (int64, *e.Error) {
-	count, err := s.sysPermissionDao.GetPermissionCount(db.Mysql)
+func (svc *SysPermissionServiceImpl) GetPermissionCount() (int64, *e.Error) {
+	count, err := svc.sysPermissionDao.GetPermissionCount(db.Mysql)
 	if err != nil {
 		return 0, e.ErrMysql
 	}
 	return count, nil
 }
 
-func (s *SysPermissionServiceImpl) DeletePermissionByID(id uint) *e.Error {
+func (svc *SysPermissionServiceImpl) DeletePermissionByID(id uint) *e.Error {
 	err := db.Mysql.Transaction(func(tx *gorm.DB) error {
 		// 递归删除权限
-		err := s.deletePermissionsRecursive(tx, id)
+		err := svc.deletePermissionsRecursive(tx, id)
 		return err
 	})
 	if err != nil {
@@ -56,35 +56,35 @@ func (s *SysPermissionServiceImpl) DeletePermissionByID(id uint) *e.Error {
 }
 
 // deletePermissionsRecursive 递归删除权限
-func (s *SysPermissionServiceImpl) deletePermissionsRecursive(db *gorm.DB, parentID uint) error {
-	childPermissions, err := s.sysPermissionDao.GetChildPermissionsByParentID(db, parentID)
+func (svc *SysPermissionServiceImpl) deletePermissionsRecursive(db *gorm.DB, parentID uint) error {
+	childPermissions, err := svc.sysPermissionDao.GetChildPermissionsByParentID(db, parentID)
 	if err != nil {
 		return err
 	}
 	for _, childPermission := range childPermissions {
 		// 删除子api的子api
-		if err = s.deletePermissionsRecursive(db, childPermission.ID); err != nil {
+		if err = svc.deletePermissionsRecursive(db, childPermission.ID); err != nil {
 			return err
 		}
 	}
 	// 当前api
-	if err = s.sysPermissionDao.DeletePermissionByID(db, parentID); err != nil {
+	if err = svc.sysPermissionDao.DeletePermissionByID(db, parentID); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *SysPermissionServiceImpl) UpdatePermission(permission *repository.SysPermission) *e.Error {
+func (svc *SysPermissionServiceImpl) UpdatePermission(permission *repository.SysPermission) *e.Error {
 	permission.UpdatedAt = time.Now()
-	err := s.sysPermissionDao.UpdatePermission(db.Mysql, permission)
+	err := svc.sysPermissionDao.UpdatePermission(db.Mysql, permission)
 	if err != nil {
 		return e.ErrMysql
 	}
 	return nil
 }
 
-func (s *SysPermissionServiceImpl) InsertPermission(permission *repository.SysPermission) (uint, *e.Error) {
-	err := s.sysPermissionDao.InsertPermission(db.Mysql, permission)
+func (svc *SysPermissionServiceImpl) InsertPermission(permission *repository.SysPermission) (uint, *e.Error) {
+	err := svc.sysPermissionDao.InsertPermission(db.Mysql, permission)
 	if err != nil {
 		return 0, e.ErrMysql
 	}
@@ -102,10 +102,10 @@ func (s *SysPermissionServiceImpl) GetPermissionByID(id uint) (*repository.SysPe
 	return permission, nil
 }
 
-func (s *SysPermissionServiceImpl) GetPermissionTree() ([]*dto.SysPermissionTreeDto, *e.Error) {
+func (svc *SysPermissionServiceImpl) GetPermissionTree() ([]*dto.SysPermissionTreeDto, *e.Error) {
 	var permissionList []*repository.SysPermission
 	var err error
-	if permissionList, err = s.sysPermissionDao.GetAllPermission(db.Mysql); err != nil {
+	if permissionList, err = svc.sysPermissionDao.GetAllPermission(db.Mysql); err != nil {
 		return nil, e.ErrMysql
 	}
 

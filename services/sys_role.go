@@ -42,8 +42,8 @@ func NewSysRoleService(roleDao dao.SysRoleDao) SysRoleService {
 	}
 }
 
-func (s *SysRoleServiceImpl) GetRoleByID(roleID uint) (*repository.SysRole, *e.Error) {
-	role, err := s.sysRoleDao.GetRoleByID(db.Mysql, roleID)
+func (svc *SysRoleServiceImpl) GetRoleByID(roleID uint) (*repository.SysRole, *e.Error) {
+	role, err := svc.sysRoleDao.GetRoleByID(db.Mysql, roleID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, e.ErrRoleNotExist
@@ -54,39 +54,39 @@ func (s *SysRoleServiceImpl) GetRoleByID(roleID uint) (*repository.SysRole, *e.E
 	return role, nil
 }
 
-func (s *SysRoleServiceImpl) InsertRole(role *repository.SysRole) (uint, *e.Error) {
-	err := s.sysRoleDao.InsertRole(db.Mysql, role)
+func (svc *SysRoleServiceImpl) InsertRole(role *repository.SysRole) (uint, *e.Error) {
+	err := svc.sysRoleDao.InsertRole(db.Mysql, role)
 	if err != nil {
 		return 0, e.ErrMysql
 	}
 	return role.ID, nil
 }
 
-func (r *SysRoleServiceImpl) UpdateRole(sysRole *repository.SysRole) *e.Error {
+func (svc *SysRoleServiceImpl) UpdateRole(sysRole *repository.SysRole) *e.Error {
 	sysRole.UpdatedAt = time.Now()
-	err := r.sysRoleDao.UpdateRole(db.Mysql, sysRole)
+	err := svc.sysRoleDao.UpdateRole(db.Mysql, sysRole)
 	if err != nil {
 		return e.ErrMysql
 	}
 	return nil
 }
 
-func (r *SysRoleServiceImpl) DeleteRole(id uint) *e.Error {
+func (svc *SysRoleServiceImpl) DeleteRole(id uint) *e.Error {
 	// 删除删除角色
-	err := r.sysRoleDao.DeleteRoleByID(db.Mysql, id)
+	err := svc.sysRoleDao.DeleteRoleByID(db.Mysql, id)
 	if err != nil {
 		return e.ErrMysql
 	}
 	return nil
 }
 
-func (s *SysRoleServiceImpl) GetRoleList(query *request.PageQuery) (*response.PageInfo, *e.Error) {
+func (svc *SysRoleServiceImpl) GetRoleList(query *request.PageQuery) (*response.PageInfo, *e.Error) {
 	var roleQuery *request.SysRoleForList
 	if query.Query != nil {
 		roleQuery = query.Query.(*request.SysRoleForList)
 	}
 	// 获取角色列表
-	sysSysRoles, err := s.sysRoleDao.GetRoleList(db.Mysql, query)
+	sysSysRoles, err := svc.sysRoleDao.GetRoleList(db.Mysql, query)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
@@ -96,7 +96,7 @@ func (s *SysRoleServiceImpl) GetRoleList(query *request.PageQuery) (*response.Pa
 	}
 	// 获取所有角色总数目
 	var count int64
-	count, err = s.sysRoleDao.GetRoleCount(db.Mysql, roleQuery)
+	count, err = svc.sysRoleDao.GetRoleCount(db.Mysql, roleQuery)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
@@ -108,14 +108,14 @@ func (s *SysRoleServiceImpl) GetRoleList(query *request.PageQuery) (*response.Pa
 	return pageInfo, nil
 }
 
-func (s *SysRoleServiceImpl) UpdateRolePermissions(roleID uint, permissionIDs []uint) *e.Error {
+func (svc *SysRoleServiceImpl) UpdateRolePermissions(roleID uint, permissionIDs []uint) *e.Error {
 	tx := db.Mysql.Begin()
-	err := s.sysRoleDao.DisGrantPermissionsByRoleID(tx, roleID)
+	err := svc.sysRoleDao.DisGrantPermissionsByRoleID(tx, roleID)
 	if err != nil {
 		tx.Rollback()
 		return e.ErrMysql
 	}
-	err = s.sysRoleDao.GrantPermissionsToRole(tx, roleID, permissionIDs)
+	err = svc.sysRoleDao.GrantPermissionsToRole(tx, roleID, permissionIDs)
 	if err != nil {
 		tx.Rollback()
 		return e.ErrMysql
@@ -124,16 +124,16 @@ func (s *SysRoleServiceImpl) UpdateRolePermissions(roleID uint, permissionIDs []
 	return nil
 }
 
-func (r *SysRoleServiceImpl) GetPermissionIDsByRoleID(roleID uint) ([]uint, *e.Error) {
-	permissionIDs, err := r.sysRoleDao.GetPermissionIDsByRoleID(db.Mysql, roleID)
+func (svc *SysRoleServiceImpl) GetPermissionIDsByRoleID(roleID uint) ([]uint, *e.Error) {
+	permissionIDs, err := svc.sysRoleDao.GetPermissionIDsByRoleID(db.Mysql, roleID)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
 	return permissionIDs, nil
 }
 
-func (r *SysRoleServiceImpl) GetPermissionsByRoleID(roleID uint) ([]*repository.SysPermission, *e.Error) {
-	permissions, err := r.sysRoleDao.GetPermissionsByRoleID(db.Mysql, roleID)
+func (svc *SysRoleServiceImpl) GetPermissionsByRoleID(roleID uint) ([]*repository.SysPermission, *e.Error) {
+	permissions, err := svc.sysRoleDao.GetPermissionsByRoleID(db.Mysql, roleID)
 	if err != nil {
 		return nil, e.ErrMysql
 	}
