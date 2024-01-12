@@ -4,7 +4,10 @@ import (
 	conf "funoj-backend/config"
 	e "funoj-backend/consts/error"
 	"funoj-backend/dao"
+	"funoj-backend/file_store"
+	"funoj-backend/utils"
 	"mime/multipart"
+	"path"
 )
 
 const (
@@ -32,5 +35,16 @@ func NewProblemMenuService(config *conf.AppConfig, pbm dao.ProblemMenuDao, pb da
 }
 
 func (svc *ProblemMenuServiceImpl) UploadProblemMenuIcon(file *multipart.FileHeader) (string, *e.Error) {
-
+	cos := file_store.NewImageCOS(svc.config.COSConfig)
+	fileName := file.Filename
+	fileName = utils.GetUUID() + "." + path.Base(fileName)
+	file2, err := file.Open()
+	if err != nil {
+		return "", e.ErrBadRequest
+	}
+	err = cos.SaveFile(path.Join(ProblemBankIconPath, fileName), file2)
+	if err != nil {
+		return "", e.ErrServer
+	}
+	return svc.config.ProUrl + path.Join("/manage/problemBank/icon", fileName), nil
 }
