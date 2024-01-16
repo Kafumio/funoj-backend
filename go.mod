@@ -3,10 +3,13 @@ module funoj-backend
 go 1.20
 
 require (
+	github.com/Chain-Zhang/pinyin v0.1.3
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.5.0
 	github.com/google/wire v0.5.0
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.45
 	golang.org/x/crypto v0.14.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/ini.v1 v1.67.0
@@ -18,7 +21,6 @@ require (
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/clbanning/mxj v1.8.4 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -42,7 +44,6 @@ require (
 	github.com/onsi/gomega v1.30.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/tencentyun/cos-go-sdk-v5 v0.7.45 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect

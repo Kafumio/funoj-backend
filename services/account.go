@@ -148,7 +148,7 @@ func (svc *AccountServiceImpl) ResetPassword(ctx *gin.Context) *e.Error {
 	// 发送密码
 	message := utils.SysEmailMessage{
 		To:      []string{user.Email},
-		Subject: "fancode-重置密码",
+		Subject: "funoj-重置密码",
 		Body:    "新密码：" + passwordRoot,
 	}
 	err = utils.SendSysEmail(svc.config.EmailConfig, message)

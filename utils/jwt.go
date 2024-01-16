@@ -11,13 +11,14 @@ const (
 )
 
 type Claims struct {
-	ID        uint   `json:"id"`
-	Avatar    string `json:"avatar"`
-	Username  string `json:"username"`
-	LoginName string `json:"loginName"`
-	Phone     string `json:"phone"`
-	Email     string `json:"email"`
-	Roles     []uint `json:"roles"`
+	ID          uint     `json:"id"`
+	Avatar      string   `json:"avatar"`
+	UserName    string   `json:"userName"`
+	LoginName   string   `json:"loginName"`
+	Phone       string   `json:"phone"`
+	Email       string   `json:"email"`
+	Roles       []uint   `json:"roles"`
+	Permissions []string `json:"permissions"`
 	jwt.StandardClaims
 }
 
@@ -25,7 +26,7 @@ type Claims struct {
 // https://www.jianshu.com/p/202b04426368
 //
 //	@Description:  通过user生成token
-//	@param user    用户
+//	@param  user    用户
 //	@return string 生成的token
 //	@return error
 func GenerateToken(claims Claims) (string, error) {
