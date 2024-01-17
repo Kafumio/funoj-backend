@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"funoj-backend/config"
 	"funoj-backend/consts"
 	"os"
+	"path"
 )
 
 /**
@@ -14,6 +16,20 @@ const (
 	AcmGoCodeFilePath   = "./resources/acmTemplate/go"
 	AcmJavaCodeFilePath = "./resources/acmTemplate/java"
 )
+
+// GetExecutePath 给用户的此次运行生成一个临时目录
+func GetExecutePath(config *config.AppConfig) string {
+	uuid := GetUUID()
+	executePath := path.Join(config.FilePathConfig.TempDir, uuid)
+	return executePath
+}
+
+// GetTempDir 获取一个随机的临时文件夹
+func GetTempDir(config *config.AppConfig) string {
+	uuid := GetUUID()
+	executePath := config.FilePathConfig.TempDir + "/" + uuid
+	return executePath
+}
 
 func GetAcmCodeTemplate(language string) (string, error) {
 	var filePath string
