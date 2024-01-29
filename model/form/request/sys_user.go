@@ -9,3 +9,8 @@ type SysUserForList struct {
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`
 }
+
+type UpdateUserRolesRequest struct {
+	UserID  uint   `json:"userID"`
+	RoleIDs []uint `json:"roleIDs"`
+}
